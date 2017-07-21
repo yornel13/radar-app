@@ -1,0 +1,55 @@
+<resources>
+    <string name="app_name">Localizador Radar</string>
+    <string name="resume">Localizar</string>
+    <string name="pause">Buscando...</string>
+    <string name="gps_not_supported">Sin soporte de GPS</string>
+    <string name="gps_set_location_listener">Iniciando GPS con intervalo = %1$ss, min. dist. = %2$sm</string>
+
+    <string name="gps_latitude_label">Latitud:</string>
+    <string name="gps_latitude_value">%1$.7f\u00B0</string>
+    <string name="gps_longitude_label">Longitud:</string>
+    <string name="gps_longitude_value">%1$.7f\u00B0</string>
+    <string name="gps_fix_time_label">Time:</string>
+    <string name="gps_ttff_label">TTFF:</string>
+    <string name="gps_altitude_label">Altitud:</string>
+    <string name="gps_altitude_value">%1$.1f m</string>
+    <string name="gps_altitude_msl_label">Alt (MSL):</string>
+    <string name="gps_altitude_msl_value">%1$.1f m</string>
+    <string name="gps_accuracy_label">Precisión:</string>
+    <string name="gps_accuracy_value">%1$.1f m</string>
+    <string name="gps_speed_label">Speed:</string>
+    <string name="gps_speed_value">%1$.1f m/sec</string>
+    <string name="gps_bearing_label">Bearing:</string>
+    <string name="gps_bearing_value">%1$.1f\u00B0</string>
+    <string name="gps_num_sats_label"># Sats:</string>
+    <string name="gps_num_sats_value">%1$d/%2$d</string>
+    <string name="pdop_label">PDOP:</string>
+    <string name="hvdop_label">H/V DOP:</string>
+    <string name="hvdop_value">%1$.1f/%2$.1f</string>
+    <string name="searching">Localizando</string>
+    <string name="enable_gps_message">El GPS esta desabilitado. Habilitarlo ahora?</string>
+    <string name="enable_gps_positive_button">Habilitar GPS</string>
+    <string name="enable_gps_negative_button">No</string>
+    <string name="saving">Guardando..</string>
+    <string name="register">Registrar</string>
+    <string name="canceling">Cancelando...</string>
+    <string name="cancel">Cancelar</string>
+
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
+        AIzaSyA24mC9OAkD08aAkO_UADkSOSxaCKUZFBQ
+    </string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="save">Guardar</string>
+    <string name="add">Agregar</string>
+    <string name="delete">Borrar</string>
+    <string name="position_name">Nombre del punto de Control</string>
+    <string name="init_new_watch">Iniciando nueva guardia...</string>
+    <string name="position_saved">Posicion guardada!</string>
+    <string name="si">SI</string>
+    <string name="finish_watch">Terminar Guardia</string>
+    <string name="finish_watch_text_dialog">¿Seguro que desea terminar la guardia?</string>
+    <string name="no">NO</string>
+</resources>

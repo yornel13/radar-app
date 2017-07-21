@@ -1,0 +1,192 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.guardias.yornel.gpslocation.app.MapFragment">
+
+    <RelativeLayout
+        android:id="@+id/container_radar"
+        android:visibility="visible"
+        android:background="@color/colorPrimary"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="150dp">
+
+        <RelativeLayout
+            android:id="@+id/layout_main_searching"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="150dp">
+
+            <TextView
+                android:id="@+id/loading"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:text="@string/searching"
+                android:textSize="24dp"
+                style="@style/info_label"/>
+
+            <TextView
+                android:id="@+id/loading_text"
+                android:text="..."
+                android:textSize="24dp"
+                style="@style/info_label"
+                android:layout_alignBaseline="@+id/loading"
+                android:layout_alignBottom="@+id/loading"
+                android:layout_toEndOf="@+id/loading" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/layout_main_content"
+            android:visibility="visible"
+            android:layout_alignParentTop="true"
+            android:layout_width="match_parent"
+            android:layout_height="150dp">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TableLayout
+                    android:layout_margin="@dimen/table_margin"
+                    android:layout_gravity="top|left"
+                    android:id="@+id/time_table"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TableRow>
+                        <TextView
+                            android:id="@+id/fix_time_label"
+                            android:text="@string/gps_fix_time_label"
+                            android:layout_gravity="right"
+                            android:layout_marginRight="8dip"
+                            style="@style/info_label"/>
+
+                        <TextView
+                            android:id="@+id/fix_time"
+                            style="@style/info_value"/>
+                    </TableRow>
+
+                </TableLayout>
+
+                <TableLayout
+                    android:layout_margin="@dimen/table_margin"
+                    android:layout_gravity="bottom|left"
+                    android:id="@+id/lat_long_table"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TableRow>
+                        <TextView
+                            android:id="@+id/latitude_label"
+                            android:text="@string/gps_latitude_label"
+                            android:layout_gravity="right"
+                            android:layout_marginRight="8dip"
+                            style="@style/info_label"/>
+
+                        <TextView
+                            android:id="@+id/latitude"
+                            style="@style/info_value"/>
+                    </TableRow>
+
+                    <TableRow>
+                        <TextView
+                            android:id="@+id/longitude_label"
+                            android:text="@string/gps_longitude_label"
+                            android:layout_gravity="right"
+                            android:layout_marginRight="8dip"
+                            style="@style/info_label"/>
+
+                        <TextView
+                            android:id="@+id/longitude"
+                            style="@style/info_value"/>
+                    </TableRow>
+
+                </TableLayout>
+
+            </FrameLayout>
+
+            <com.dd.CircularProgressButton
+                android:id="@+id/circularButton1"
+                android:layout_width="196dp"
+                android:layout_height="64dp"
+                android:textColor="@color/cpb_white"
+                android:textSize="18sp"
+                app:cpb_cornerRadius="48dp"
+                app:cpb_textComplete="Listo"
+                app:cpb_textError="Error"
+                app:cpb_textIdle="@string/register"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="18dp" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <com.google.android.gms.maps.MapView
+        android:layout_below="@id/container_radar"
+        android:id="@+id/mapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <ImageButton
+        android:background="@drawable/button_like_location"
+        android:layout_below="@id/container_radar"
+        android:onClick="updateMapView"
+        android:layout_marginTop="60dp"
+        android:layout_marginRight="12dp"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/red_marker_24"
+        android:layout_width="39dp"
+        android:layout_height="39dp" />
+
+    <RelativeLayout
+        android:id="@+id/container_position_details"
+        android:visibility="gone"
+        android:background="@color/colorPrimary"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="200dp">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_margin="50dp"
+                android:src="@drawable/red_marker_128"
+                android:layout_width="100dp"
+                android:layout_height="100dp" />
+
+            <LinearLayout
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/name_position"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="24dp"
+                    style="@style/info_value"/>
+
+                <TextView
+                    android:id="@+id/distance_position"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="24dp"
+                    style="@style/info_value"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

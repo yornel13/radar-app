@@ -1,0 +1,38 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true"
+    tools:context=".app.GuardActivity">
+
+    <FrameLayout
+        android:id="@+id/principal_container_searching"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TableLayout
+            android:layout_margin="@dimen/table_margin"
+            android:layout_gravity="bottom|left"
+            android:id="@+id/speed_table"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TableRow>
+                <TextView
+                    android:text="@string/searching"
+                    android:layout_gravity="right"
+                    android:layout_marginRight="8dip"
+                    android:textSize="18dp"
+                    style="@style/info_label"/>
+
+            </TableRow>
+
+        </TableLayout>
+
+    </FrameLayout>
+
+
+
+</RelativeLayout>

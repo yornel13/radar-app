@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    tools:context="com.guardias.yornel.gpslocation.app.MapFragment">
+    tools:context="com.guardias.yornel.gpslocation.app.GuardMapFragment">
 
     <RelativeLayout
         android:id="@+id/container_radar"

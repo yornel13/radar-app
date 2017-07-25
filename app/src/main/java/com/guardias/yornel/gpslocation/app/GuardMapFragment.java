@@ -1,7 +1,6 @@
 package com.guardias.yornel.gpslocation.app;
 
 import android.Manifest;
-import android.app.Fragment;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -12,6 +11,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,19 +39,16 @@ import com.guardias.yornel.gpslocation.entity.ControlPosition;
 import com.guardias.yornel.gpslocation.entity.Position;
 import com.guardias.yornel.gpslocation.util.AppPreferences;
 import com.guardias.yornel.gpslocation.util.GpsTestListener;
-import com.guardias.yornel.gpslocation.util.SingleShotLocationProvider;
 
-import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 import io.realm.RealmResults;
 
 import static com.guardias.yornel.gpslocation.util.Const.CAMERA_ANCHOR_ZOOM;
-import static com.guardias.yornel.gpslocation.util.Const.CAMERA_INITIAL_ZOOM;
-import static com.guardias.yornel.gpslocation.util.Const.MOVE_MAP_INTERACTION_THRESHOLD;
 
-public class MapFragment extends Fragment implements OnMapReadyCallback, GpsTestListener,
+public class GuardMapFragment extends Fragment implements OnMapReadyCallback, GpsTestListener,
         LocationSource, GoogleMap.OnMapClickListener,
         GoogleMap.OnMapLongClickListener, GoogleMap.OnMyLocationButtonClickListener,
         GoogleMap.OnMarkerClickListener, GoogleMap.OnMapLoadedCallback {
@@ -71,6 +68,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GpsTest
     private TextView mLatitudeView;
     private TextView mLongitudeView;
     private TextView mFixTimeView;
+
+    private TextView nearText;
+    private View nearContainer;
 
     private TextView namePosition;
     private TextView distancePosition;
@@ -126,10 +126,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GpsTest
         layoutContent = rootView.findViewById(R.id.layout_main_content);
         layoutSearching = rootView.findViewById(R.id.layout_main_searching);
         containerDetails = rootView.findViewById(R.id.container_position_details);
+        nearContainer = rootView.findViewById(R.id.near_container);
 
         mLatitudeView = (TextView) rootView.findViewById(R.id.latitude);
         mLongitudeView = (TextView) rootView.findViewById(R.id.longitude);
         mFixTimeView = (TextView) rootView.findViewById(R.id.fix_time);
+        nearText = (TextView) rootView.findViewById(R.id.near_of);
 
         namePosition = (TextView) rootView.findViewById(R.id.name_position);
         distancePosition = (TextView) rootView.findViewById(R.id.distance_position);
@@ -179,7 +181,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GpsTest
     public void saveActualPosition() {
         ArrayList<Marker> nearMarkers = getInMeters();
         if (nearMarkers.isEmpty()) {
-            Toast.makeText(getActivity(), "Ningun marcador cerca", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.none_control_point, Toast.LENGTH_SHORT).show();
             circularButton.setProgress(-1);
         } else if (nearMarkers.size() == 1) {
             ControlPosition controlPosition = ((ControlPosition) nearMarkers.get(0).getTag());
@@ -194,20 +196,31 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GpsTest
             Snackbar.make(layoutContent, R.string.position_saved, Snackbar.LENGTH_LONG).show();
             circularButton.setProgress(100);
         } else if (nearMarkers.size() > 1) {
-            Toast.makeText(getActivity(), "mas de 1 marcador cercano", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), getString(R.string.much_control_position), Toast.LENGTH_SHORT).show();
             circularButton.setProgress(-1);
         }
         updateButtonTemporary();
     }
 
     void setToWindows(Location location) {
-        mLatitudeView.setText(getString(R.string.gps_latitude_value, location.getLatitude()));
+        ArrayList<Marker> nearMarkers = getInMeters();
+        if (nearMarkers.isEmpty()) {
+            nearContainer.setVisibility(View.GONE);
+        } else if (nearMarkers.size() == 1) {
+            ControlPosition controlPosition = ((ControlPosition) nearMarkers.get(0).getTag());
+            nearContainer.setVisibility(View.VISIBLE);
+            nearText.setText(controlPosition.getPlaceName());
+        } else if (nearMarkers.size() > 1) {
+            nearContainer.setVisibility(View.VISIBLE);
+            nearText.setText(getString(R.string.much_control_position));
+        }
+        /*mLatitudeView.setText(getString(R.string.gps_latitude_value, location.getLatitude()));
         mLongitudeView.setText(getString(R.string.gps_longitude_value, location.getLongitude()));
         mFixTime = location.getTime();
-        updateFixTime();
+        updateFixTime();*/
     }
 
-    void getPosition() {
+    /*void getPosition() {
         ((GuardActivity) getActivity()).invertLocating();
         SingleShotLocationProvider.requestSingleUpdate(getActivity(),
                 new SingleShotLocationProvider.LocationCallback() {
@@ -218,11 +231,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GpsTest
                                     +String.valueOf(location.getLongitude()), Toast.LENGTH_SHORT).show();
                             circularButton.setProgress(100);
                             ((GuardActivity) getActivity()).invertLocating();
+
+                            Marker markerPosition = mMap.addMarker(new MarkerOptions()
+                                    .position(new LatLng(
+                                            location.getLatitude(),
+                                            location.getLongitude())));
+                            //markerPosition.setTag(guardActivity.realm.copyFromRealm(position).getControlPosition());
+                            markerPosition.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.blue_marker_24));
                             updateButtonTemporary();
                         }
                     }
                 });
-    }
+    }*/
 
     void disableRegister() {
         layoutContent.setVisibility(View.GONE);
@@ -283,7 +303,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GpsTest
     ArrayList<Marker> getInMeters() {
 
         int meters = 5;
-        System.out.println("cantidad de markers "+markers.size());
 
         ArrayList<Marker> nearMarkers = new ArrayList<>();
         for (Marker marker : markers) {
@@ -299,8 +318,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GpsTest
 
             Float distanceInMeters = loc1.distanceTo(loc2);
 
-            System.out.println(distanceInMeters.intValue()+" metros");
-            System.out.println("para "+position.getPlaceName());
             if (distanceInMeters.intValue() <= meters) {
                 nearMarkers.add(marker);
             }
@@ -309,7 +326,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GpsTest
     }
 
     public  void addMarkers() {
-        positions = DataHelper.getAllControlPositions();
+        positions = DataHelper.getAllControlPositionsActive();
 
         int accuracyStrokeColor = Color.argb(255, 204, 0, 0);
         int accuracyFillColor = Color.argb(50, 204, 0, 0);
@@ -338,13 +355,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GpsTest
 
     public  void addMarkersPosition() {
 
-        if (preferences.getPositions() != null)
-            for (Position position: preferences.getPositions()) {
+        List<Position> positions = preferences.getPositions();
+
+        if (positions != null) {
+            for (Position position : preferences.getPositions()) {
                 Marker markerPosition = mMap.addMarker(new MarkerOptions()
-                        .position(new LatLng(position.getLatitude(), position.getLongitude())));
+                        .position(new LatLng(
+                                position.getControlPosition().getLatitude(),
+                                position.getControlPosition().getLongitude())));
                 //markerPosition.setTag(guardActivity.realm.copyFromRealm(position).getControlPosition());
                 markerPosition.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.flag_blue_32));
             }
+
+            guardActivity.mSectionsPagerAdapter.list.setAdapterPositions(positions);
+        }
     }
 
     public void updateCameraFromAllPoints() {
@@ -376,6 +400,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GpsTest
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
+    public void updateCameraFromPosition(LatLng latLng) {
+        if (mMap == null || latLng == null) {
+            return;
+        }
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(latLng)
+                .zoom(CAMERA_ANCHOR_ZOOM)
+                .build();
+
+        mMap.animateCamera(CameraUpdateFactory
+                .newCameraPosition(cameraPosition));
+    }
+
     @Override
     public void gpsStart() {
         mGotFix = false;
@@ -391,41 +428,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GpsTest
     }
 
     @Override
-    public void onGnssFirstFix(int ttffMillis) {
-
-    }
-
-    @Override
-    public void onSatelliteStatusChanged(GnssStatus status) {
-
-    }
-
-    @Override
-    public void onGnssStarted() {
-
-    }
-
-    @Override
-    public void onGnssStopped() {
-
-    }
-
-    @Override
-    public void onGnssMeasurementsReceived(GnssMeasurementsEvent event) {
-
-    }
-
-    @Override
-    public void onOrientationChanged(double orientation, double tilt) {
-
-    }
-
-    @Override
-    public void onNmeaMessage(String message, long timestamp) {
-
-    }
-
-    @Override
     public void onStartRegister() {
 
     }
@@ -437,7 +439,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GpsTest
 
     @Override
     public void onUpdateMapView() {
-        if (markers != null) {
+        if (markers != null && markers.size() > 0) {
             updateCameraFromAllPoints();
         }
     }
@@ -518,7 +520,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GpsTest
 
             distancePosition.setText("a "+distanceInMeters.intValue()+" metros de distancia");
         }
-        return false;
+
+        updateCameraFromPosition(marker.getPosition());
+
+        return true;
     }
 
     public void startTimer() {

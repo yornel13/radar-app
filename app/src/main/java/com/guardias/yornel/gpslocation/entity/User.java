@@ -19,6 +19,10 @@ public class User extends RealmObject {
 	private String dni;
 	private String name;
 	private String lastname;
+	private String password;
+	private Long create;
+	private Long update;
+	private Boolean active;
 
 	@Ignore
 	List<Watch> watches;
@@ -67,6 +71,38 @@ public class User extends RealmObject {
 
 	public void setDni(String dni) {
 		this.dni = dni;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public Long getCreate() {
+		return create;
+	}
+
+	public void setCreate(Long create) {
+		this.create = create;
+	}
+
+	public Long getUpdate() {
+		return update;
+	}
+
+	public void setUpdate(Long update) {
+		this.update = update;
+	}
+
+	public Boolean getActive() {
+		return active;
+	}
+
+	public void setActive(Boolean active) {
+		this.active = active;
 	}
 
 	public List<Watch> getWatches() {

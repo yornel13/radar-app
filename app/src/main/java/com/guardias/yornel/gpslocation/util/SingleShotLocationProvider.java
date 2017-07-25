@@ -44,7 +44,7 @@ public class SingleShotLocationProvider {
                 criteria.setAltitudeRequired(false);
                 criteria.setBearingRequired(false);
                 criteria.setCostAllowed(true);
-                criteria.setPowerRequirement(Criteria.POWER_MEDIUM);
+                criteria.setPowerRequirement(Criteria.POWER_HIGH);
                 locationManager.requestSingleUpdate(criteria, new LocationListener() {
                     @Override
                     public void onLocationChanged(Location location) {

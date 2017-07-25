@@ -1,10 +1,10 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.guardias.yornel.gpslocation.app.MapFragment">
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    tools:context="com.guardias.yornel.gpslocation.app.GuardMapFragment">
 
     <RelativeLayout
         android:id="@+id/container_radar"
@@ -46,7 +46,9 @@
             android:layout_width="match_parent"
             android:layout_height="150dp">
 
+
             <FrameLayout
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
@@ -109,6 +111,37 @@
 
             </FrameLayout>
 
+            <RelativeLayout
+                android:id="@+id/near_container"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toStartOf="@+id/circularButton1">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:text="@string/near_of"
+                        android:textSize="18dp"
+                        android:textColor="@color/white_semi_transparent"
+                        style="@style/info_label"/>
+
+                    <TextView
+                        android:id="@+id/near_of"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:textSize="22dp"
+                        style="@style/info_label"/>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
             <com.dd.CircularProgressButton
                 android:id="@+id/circularButton1"
                 android:layout_width="196dp"
@@ -144,13 +177,16 @@
         android:layout_width="39dp"
         android:layout_height="39dp" />
 
-    <RelativeLayout
+    <android.support.v7.widget.CardView
+        android:layout_margin="3dp"
         android:id="@+id/container_position_details"
         android:visibility="gone"
-        android:background="@color/colorPrimary"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
-        android:layout_height="200dp">
+        android:layout_height="160dp"
+        android:clickable="true"
+        card_view:cardBackgroundColor="@color/colorPrimaryTrans"
+        card_view:cardCornerRadius="4dp">
 
         <LinearLayout
             android:orientation="horizontal"
@@ -158,10 +194,10 @@
             android:layout_height="match_parent">
 
             <de.hdodenhof.circleimageview.CircleImageView
-                android:layout_margin="50dp"
+                android:layout_margin="40dp"
                 android:src="@drawable/red_marker_128"
-                android:layout_width="100dp"
-                android:layout_height="100dp" />
+                android:layout_width="80dp"
+                android:layout_height="80dp" />
 
             <LinearLayout
                 android:gravity="center"
@@ -187,6 +223,6 @@
 
         </LinearLayout>
 
-    </RelativeLayout>
+    </android.support.v7.widget.CardView>
 
 </RelativeLayout>

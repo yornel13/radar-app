@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical"
+    android:scrollbarAlwaysDrawVerticalTrack="true">
+
+    <RelativeLayout
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="380dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="70dp"
+            android:background="#fff"
+            android:elevation="4dp"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <LinearLayout
+                android:gravity="center"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="70dp">
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/input_user"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/login_user_icon"
+                        android:maxLines="1"
+                        android:hint=" Usuario"
+                        android:imeOptions="actionDone"
+                        android:inputType="textNoSuggestions" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/input_password"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:maxLines="1"
+                        android:drawableLeft="@drawable/login_password_icon"
+                        android:hint=" Contraseña"
+                        android:imeOptions="actionDone"
+                        android:inputType="textPassword" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <Button
+                    android:onClick="login"
+                    android:layout_width="300dp"
+                    android:layout_height="60dp"
+                    android:layout_margin="40dp"
+                    android:background="@drawable/button_effect_square"
+                    android:text="ENTRAR"
+                    android:textAllCaps="false"
+                    android:textColor="#fff"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <ImageButton
+            android:onClick="changeUserType"
+            android:id="@+id/change_user_login"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/user_profile_image_background"
+            android:elevation="4dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/policeman" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/login_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="122dp"
+        android:gravity="center_horizontal"
+        android:text="@string/title_login_guard"
+        android:textColor="#fff"
+        android:textSize="26sp"
+        android:textStyle="bold" />
+
+</RelativeLayout>

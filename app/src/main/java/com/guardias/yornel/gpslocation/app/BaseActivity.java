@@ -41,7 +41,7 @@ public class BaseActivity extends AppCompatActivity {
         preferences = new AppPreferences(this);
 
         Realm.init(getApplicationContext());
-        File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "databases");
+        //File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "databases");
         RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
                 .name(DB_NAME)
                 .schemaVersion(0)
@@ -121,14 +121,14 @@ public class BaseActivity extends AppCompatActivity {
 
 
     public void showProgressDialog(String text) {
-        progressDialog = new ProgressDialog(this,
-                R.style.AppTheme_Dark_Dialog);
+        progressDialog = new ProgressDialog(this);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage(text);
         progressDialog.show();
     }
 
     public void hideProgressDialog() {
-        progressDialog.dismiss();
+        if (progressDialog != null)
+            progressDialog.dismiss();
     }
 }

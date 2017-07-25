@@ -81,7 +81,7 @@ public class AdminFragment extends Fragment implements OnMapReadyCallback, GpsTe
 
     private OnLocationChangedListener mListener; //Used to update the map with new location
 
-    ArrayList<Marker> markers = new ArrayList<>();
+    ArrayList<Marker> markers;
     RealmResults<ControlPosition> positions;
 
     private long mLastMapTouchTime = 0;
@@ -303,8 +303,8 @@ public class AdminFragment extends Fragment implements OnMapReadyCallback, GpsTe
     }
 
     public  void addMarkers(Boolean moveCamera) {
+
         positions = DataHelper.getAllControlPositions();
-        System.out.println("Cantidad de posiciones "+positions.size());
 
         markers = new ArrayList<>();
 
@@ -314,7 +314,11 @@ public class AdminFragment extends Fragment implements OnMapReadyCallback, GpsTe
             Marker markerPosition = mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(position.getLatitude(), position.getLongitude())));
             markerPosition.setTag(position);
-            markerPosition.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.red_marker_32));
+            if (position.getId() == null)
+                markerPosition.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.red_marker_32));
+            else {
+                markerPosition.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.green_marker_32));
+            }
             markers.add(markerPosition);
         }
         if (!markers.isEmpty() && moveCamera)
@@ -391,41 +395,6 @@ public class AdminFragment extends Fragment implements OnMapReadyCallback, GpsTe
     }
 
     @Override
-    public void onGnssFirstFix(int ttffMillis) {
-
-    }
-
-    @Override
-    public void onSatelliteStatusChanged(GnssStatus status) {
-
-    }
-
-    @Override
-    public void onGnssStarted() {
-
-    }
-
-    @Override
-    public void onGnssStopped() {
-
-    }
-
-    @Override
-    public void onGnssMeasurementsReceived(GnssMeasurementsEvent event) {
-
-    }
-
-    @Override
-    public void onOrientationChanged(double orientation, double tilt) {
-
-    }
-
-    @Override
-    public void onNmeaMessage(String message, long timestamp) {
-
-    }
-
-    @Override
     public void onStartRegister() {
 
     }
@@ -437,7 +406,7 @@ public class AdminFragment extends Fragment implements OnMapReadyCallback, GpsTe
 
     @Override
     public void onUpdateMapView() {
-        if (markers != null) {
+        if (markers != null && markers.size() > 0) {
             updateCameraFromAllPoints();
         }
     }

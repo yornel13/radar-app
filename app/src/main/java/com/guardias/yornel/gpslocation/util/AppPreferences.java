@@ -17,7 +17,7 @@ import java.util.ArrayList;
  */
 public class AppPreferences {
 
-    public static final String PREF_FILE_NAME = "app-radar13";
+    public static final String PREF_FILE_NAME = "app-radar14";
 
     private static final String ID = "id";
     private static final String C_POSITION = "control_position";

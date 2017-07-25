@@ -18,5 +18,5 @@ public class Const {
     public static final float CAMERA_MAX_TILT = 90.0f;
     public static final double TARGET_OFFSET_METERS = 150;
 
-    public static final String DB_NAME = "dbradar";
+    public static final String DB_NAME = "dbradar_V2";
 }

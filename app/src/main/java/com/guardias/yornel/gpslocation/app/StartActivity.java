@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.guardias.yornel.gpslocation.R;
-import com.guardias.yornel.gpslocation.db.DataHelper;
-import com.guardias.yornel.gpslocation.entity.User;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -45,7 +43,7 @@ public class StartActivity extends BaseActivity {
 
     void runActivity(int userTime) {
         if (userTime == USER_ADMIN) {
-            startActivity(new Intent(this, MainAdminSelectActivity.class));
+            startActivity(new Intent(this, MainAdminActivity.class));
             finish();
         } else if (userTime == USER_GUARD) {
             startActivity(new Intent(this, GuardActivity.class));

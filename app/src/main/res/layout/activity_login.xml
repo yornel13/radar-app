@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
+    tools:context=".app.LoginActivity" >
+
+    <RelativeLayout
+        android:id="@+id/container_image"
+        android:background="@color/colorPrimary"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="center"
+            android:src="@drawable/radar_splash" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:visibility="gone"
+        android:id="@+id/container_login"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include
+            layout="@layout/login_layout">
+        </include>
+
+    </RelativeLayout>
+
+</RelativeLayout>

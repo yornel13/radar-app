@@ -17,7 +17,9 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -45,16 +47,10 @@ public class GuardActivity extends BaseActivity implements LocationListener {
 
     private static final String TAG = "GuardActivity";
 
-    public static final long SPLASH_SCREEN_DELAY = 1500;
-
     private static GuardActivity sInstance;
 
     private LocationManager mLocationManager;
     private LocationProvider mProvider;
-    private Location mLastLocation;
-
-    private RelativeLayout container;
-    private RelativeLayout containerLogin;
 
     // Listeners for Fragments
     private ArrayList<GpsTestListener> mGpsTestListeners = new ArrayList<>();
@@ -63,22 +59,24 @@ public class GuardActivity extends BaseActivity implements LocationListener {
     private float minDistance; // Min Distance between location updates, in meters
 
     boolean mStarted;
-    boolean mLogNmea;
-    boolean mWriteNmeaTimestampToLog;
     boolean locating;
 
     static GuardActivity getInstance() {
         return sInstance;
     }
 
+    GuardPagerAdapter mSectionsPagerAdapter;
+
+    ViewPager mViewPager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_principal);
-        sInstance = this;
+        setContentView(R.layout.activity_guard);
 
-        container = (RelativeLayout) findViewById(R.id.container_image);
-        containerLogin = (RelativeLayout) findViewById(R.id.container_principal);
+        mViewPager = (ViewPager) findViewById(R.id.container);
+
+        sInstance = this;
 
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         mProvider = mLocationManager.getProvider(LocationManager.GPS_PROVIDER);
@@ -104,7 +102,7 @@ public class GuardActivity extends BaseActivity implements LocationListener {
             watch.setUser(guard);
             preferences.clearWatchs();
             preferences.save(watch);
-            Snackbar.make(containerLogin, R.string.init_new_watch, Snackbar.LENGTH_LONG).show();
+            Snackbar.make(mViewPager, getString(R.string.init_new_watch), Snackbar.LENGTH_LONG).show();
             continueCreate();
         } else if (watch != null &&
                 !watch.getUser().getDni().equals(guard.getDni())) {    // if is other guard
@@ -134,9 +132,6 @@ public class GuardActivity extends BaseActivity implements LocationListener {
         }
 
         checkTimeAndDistance();
-
-        checkNmeaLog();
-
     }
 
     @Override
@@ -206,7 +201,7 @@ public class GuardActivity extends BaseActivity implements LocationListener {
         }
         preferences.clearAll();
         finish();
-        Toast.makeText(this, "Guardia terminada", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, R.string.watch_finish, Toast.LENGTH_LONG).show();
     }
 
     private void checkTimeAndDistance() {
@@ -235,11 +230,6 @@ public class GuardActivity extends BaseActivity implements LocationListener {
                 ).show();
             }
         }
-    }
-
-    private void checkNmeaLog() {
-        mLogNmea = true;
-        mWriteNmeaTimestampToLog = true;
     }
 
     private synchronized void gpsStart() {
@@ -274,19 +264,17 @@ public class GuardActivity extends BaseActivity implements LocationListener {
 
     private void initMapFragment() {
 
-        FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        MapFragment fragment = new MapFragment();
-        fragmentTransaction.add(R.id.container_principal, fragment);
-        fragmentTransaction.commit();
+        mSectionsPagerAdapter = new GuardPagerAdapter(getSupportFragmentManager());
 
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(mViewPager);
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        mLastLocation = location;
 
-        // Reset the options menu to trigger updates to action bar menu items
         invalidateOptionsMenu();
 
         for (GpsTestListener listener : mGpsTestListeners) {
@@ -381,22 +369,6 @@ public class GuardActivity extends BaseActivity implements LocationListener {
 
     public void invertLocating() {
         locating = !locating;
-    }
-
-    public void san() {
-        Watch watch = new Watch();
-        watch.setUser(preferences.getUser());
-        watch.setStartTime(System.currentTimeMillis());
-        watch.save();
-        System.out.println("Guardias "+DataHelper.getAllWatches().size());
-        System.out.println("Usuarios "+DataHelper.getAllUsers().size());
-
-        List<Watch> watches = DataHelper.getAllWatches();
-
-        System.out.println("guardias array "+new Gson().toJson(realm.copyFromRealm(watches)));
-        System.out.println("guardias array "+watches.toString());
-        //Snackbar.make(containerLogin, "Esto es otra prueba", Snackbar.LENGTH_LONG).show();
-
     }
 
 }

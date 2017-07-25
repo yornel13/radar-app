@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:background="@color/colorPrimary"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.guardias.yornel.gpslocation.app.MainAdminActivity">
+
+    <LinearLayout
+        android:gravity="center"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:text="Map"
+            android:id="@+id/map"
+            android:onClick="goMap"
+            android:layout_margin="30dp"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:background="@drawable/button_circle_background"/>
+
+        <Button
+            android:text="Importar"
+            android:id="@+id/in_import"
+            android:onClick="doImport"
+            android:layout_margin="30dp"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:background="@drawable/button_circle_background"/>
+
+        <Button
+            android:text="Exportar"
+            android:id="@+id/export"
+            android:onClick="doExport"
+            android:layout_margin="30dp"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:background="@drawable/button_circle_background"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

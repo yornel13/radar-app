@@ -78,6 +78,20 @@ public class DataHelper {
         return results;
     }
 
+    public static Admin getAdminByUsername(String user) {
+        realm = Realm.getDefaultInstance();
+        Admin results = realm.where(Admin.class)
+                .equalTo("username", user).findFirst();
+        return results;
+    }
+
+    public static RealmResults<ControlPosition> getAllControlPositionsActive() {
+        realm = Realm.getDefaultInstance();
+        RealmResults<ControlPosition> results = realm
+                .where(ControlPosition.class).greaterThan("id", 0).findAll();
+        return results;
+    }
+
     public static RealmResults<ControlPosition> getAllControlPositions() {
         realm = Realm.getDefaultInstance();
         RealmResults<ControlPosition> results = realm

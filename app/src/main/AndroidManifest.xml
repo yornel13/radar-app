@@ -19,15 +19,9 @@
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="@string/google_maps_key" />
-
         <activity
             android:name=".app.StartActivity"
             android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".app.AdminActivity"
@@ -36,9 +30,17 @@
             android:name=".app.GuardActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".app.MainAdminSelectActivity"
+            android:name=".app.MainAdminActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".app.LoginActivity"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Localizador Radar</string>
+    <string name="app_name">Radar</string>
     <string name="resume">Localizar</string>
     <string name="pause">Buscando...</string>
     <string name="gps_not_supported">Sin soporte de GPS</string>
@@ -48,18 +48,19 @@
     <string name="init_new_watch">Iniciando nueva guardia...</string>
     <string name="position_saved">Posicion guardada!</string>
     <string name="si">SI</string>
+    <string name="login">Login</string>
     <string name="finish_watch">Terminar Guardia</string>
     <string name="finish_watch_text_dialog">¿Seguro que desea terminar la guardia?</string>
     <string name="no">NO</string>
     <string name="select_message">selecciona el radar_export.json</string>
-    <string name="file_no_found">No se encontro el archivo radar_export.json en la carpeta databases</string>
+    <string name="file_no_found">Error\n\nNo se encontro el archivo radar_export.json en la carpeta databases</string>
     <string name="ok">OK</string>
     <string name="info_import">Si realiza un import la informacion previa almacenada sera borrada y reemplazada por la nueva</string>
     <string name="do_import">Importar</string>
     <string name="import_completed">Informacion actualiza con exito</string>
     <string name="title_login_guard">Ingreso de guardia</string>
     <string name="title_login_admin">Ingreso para administrador</string>
-    <string name="user_login_error">Usuario incorrecta</string>
+    <string name="user_login_error">Usuario incorrecto</string>
     <string name="password_login_error">Contrasena incorrecta</string>
     <string name="loading">Cargando...</string>
     <string name="login_error">Error de base de datos</string>
@@ -72,4 +73,9 @@
     <string name="near_of">Ubicado en</string>
     <string name="none_control_point">No hay puntos de control cercanos</string>
     <string name="without_register">Sin registros</string>
+    <string name="this_user_dont_have_route">Este usuario no tiene ruta asignada</string>
+    <string name="close_app">¿Seguro que deseas salir de la aplicacion?</string>
+    <string name="close_user">¿Seguro que desea cerrar su usuario e ir al login?</string>
+    <string name="warning_watch">Hay una guardia en curso, si continua la guardia que estaba en curso se perdera, ¿desea continuar?</string>
+    <string name="warning">Advertencia</string>
 </resources>

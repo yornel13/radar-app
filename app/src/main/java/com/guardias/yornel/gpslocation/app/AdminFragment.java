@@ -522,7 +522,11 @@ public class AdminFragment extends Fragment implements OnMapReadyCallback, GpsTe
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    ((TextView) adminActivity.findViewById(R.id.loading_text)).setText(text);
+                    try {
+                        ((TextView) adminActivity.findViewById(R.id.loading_text)).setText(text);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             });
         } catch (Exception e) {}

@@ -45,10 +45,13 @@ public class LoginUserTask extends AsyncTask<Void, Void, User> {
                 }
             }
         } catch (Exception e){
+            e.printStackTrace();
             status = 3;
         } finally {
             Realm.getDefaultInstance().close();
-            return Realm.getDefaultInstance().copyFromRealm(user);
+            if (user != null)
+                user = Realm.getDefaultInstance().copyFromRealm(user);
+            return user;
         }
     }
 

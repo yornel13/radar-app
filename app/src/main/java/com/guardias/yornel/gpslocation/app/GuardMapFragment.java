@@ -9,6 +9,8 @@ import android.location.GnssStatus;
 import android.location.GpsStatus;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -19,6 +21,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dd.CircularProgressButton;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -37,6 +42,7 @@ import com.guardias.yornel.gpslocation.R;
 import com.guardias.yornel.gpslocation.db.DataHelper;
 import com.guardias.yornel.gpslocation.entity.ControlPosition;
 import com.guardias.yornel.gpslocation.entity.Position;
+import com.guardias.yornel.gpslocation.entity.RoutePosition;
 import com.guardias.yornel.gpslocation.util.AppPreferences;
 import com.guardias.yornel.gpslocation.util.GpsTestListener;
 
@@ -85,12 +91,13 @@ public class GuardMapFragment extends Fragment implements OnMapReadyCallback, Gp
     private OnLocationChangedListener mListener; //Used to update the map with new location
 
     ArrayList<Marker> markers;
-    RealmResults<ControlPosition> positions;
+    ArrayList<ControlPosition> positions;
 
     private long mLastMapTouchTime = 0;
 
     @Override
     public void onLocationChanged(Location loc) {
+
         if (mListener != null) {
             mListener.onLocationChanged(loc);
         }
@@ -154,6 +161,7 @@ public class GuardMapFragment extends Fragment implements OnMapReadyCallback, Gp
         });
 
         preferences = new AppPreferences(getActivity());
+        ((TextView) rootView.findViewById(R.id.user_name)).setText(preferences.getUser().getFullName());
 
         mMapView = (MapView) rootView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
@@ -272,12 +280,6 @@ public class GuardMapFragment extends Fragment implements OnMapReadyCallback, Gp
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        //Show the location on the map
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
         mMap.setOnMapLoadedCallback(this);
         mMap.setMyLocationEnabled(true);
         //Set location source
@@ -290,7 +292,6 @@ public class GuardMapFragment extends Fragment implements OnMapReadyCallback, Gp
         mMap.setOnMarkerClickListener(this);
 
         GuardActivity.getInstance().addListener(this);
-
     }
 
     public void checkMarkers(boolean updateViewMap) {
@@ -326,7 +327,8 @@ public class GuardMapFragment extends Fragment implements OnMapReadyCallback, Gp
     }
 
     public  void addMarkers() {
-        positions = DataHelper.getAllControlPositionsActive();
+
+        positions = DataHelper.getAllControlsByUser(preferences.getUser());
 
         int accuracyStrokeColor = Color.argb(255, 204, 0, 0);
         int accuracyFillColor = Color.argb(50, 204, 0, 0);
@@ -635,4 +637,5 @@ public class GuardMapFragment extends Fragment implements OnMapReadyCallback, Gp
     public void onMapLoaded() {
         checkMarkers(true);
     }
+
 }

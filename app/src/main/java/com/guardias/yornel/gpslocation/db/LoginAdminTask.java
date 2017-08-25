@@ -66,7 +66,9 @@ public class LoginAdminTask extends AsyncTask<Void, Void, Admin> {
             status = 3;
         } finally {
             Realm.getDefaultInstance().close();
-            return Realm.getDefaultInstance().copyFromRealm(admin);
+            if (admin != null && admin.isManaged())
+                admin = Realm.getDefaultInstance().copyFromRealm(admin);
+            return admin;
         }
     }
 
@@ -94,8 +96,8 @@ public class LoginAdminTask extends AsyncTask<Void, Void, Admin> {
         admin.setLastname("Admin");
         admin.setUsername("admin");
         admin.setPassword(Password.MD5("admin"));
-        admin.setCreate(System.currentTimeMillis());
-        admin.setUpdate(System.currentTimeMillis());
+        admin.setCreateDate(System.currentTimeMillis());
+        admin.setLastUpdate(System.currentTimeMillis());
         admin.setActive(true);
         return admin;
     }

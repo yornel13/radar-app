@@ -18,8 +18,8 @@ public class Admin extends RealmObject {
 	private String password;
 	private String name;
 	private String lastname;
-	private Long create;
-	private Long update;
+	private Long createDate;
+	private Long lastUpdate;
 	private Boolean active;
 
 	// Constructors
@@ -35,8 +35,6 @@ public class Admin extends RealmObject {
 		this.password = password;
 		this.name = name;
 		this.lastname = lastname;
-		this.create = create;
-		this.update = update;
 		this.active = active;
 	}
 
@@ -90,20 +88,20 @@ public class Admin extends RealmObject {
 		this.lastname = lastname;
 	}
 
-	public Long getCreate() {
-		return this.create;
+	public Long getCreateDate() {
+		return createDate;
 	}
 
-	public void setCreate(Long create) {
-		this.create = create;
+	public void setCreateDate(Long createDate) {
+		this.createDate = createDate;
 	}
 
-	public Long getUpdate() {
-		return this.update;
+	public Long getLastUpdate() {
+		return lastUpdate;
 	}
 
-	public void setUpdate(Long update) {
-		this.update = update;
+	public void setLastUpdate(Long lastUpdate) {
+		this.lastUpdate = lastUpdate;
 	}
 
 	public Boolean getActive() {

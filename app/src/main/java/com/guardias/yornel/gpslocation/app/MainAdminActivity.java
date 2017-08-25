@@ -13,9 +13,12 @@ import com.guardias.yornel.gpslocation.R;
 import com.guardias.yornel.gpslocation.db.DataHelper;
 import com.guardias.yornel.gpslocation.entity.Admin;
 import com.guardias.yornel.gpslocation.entity.ControlPosition;
+import com.guardias.yornel.gpslocation.entity.Group;
 import com.guardias.yornel.gpslocation.entity.Import;
 import com.guardias.yornel.gpslocation.entity.Position;
 import com.guardias.yornel.gpslocation.entity.Export;
+import com.guardias.yornel.gpslocation.entity.Route;
+import com.guardias.yornel.gpslocation.entity.RoutePosition;
 import com.guardias.yornel.gpslocation.entity.User;
 import com.guardias.yornel.gpslocation.entity.Watch;
 
@@ -106,10 +109,33 @@ public class MainAdminActivity extends BaseActivity {
                 }).show();
     }
 
+
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
+        } else {
+            builder = new AlertDialog.Builder(this);
+        }
+        builder.setMessage(R.string.close_user)
+                .setPositiveButton(R.string.si, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        goLoginActivity();
+                    }
+                })
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // nothing to do
+                    }
+                }).show();
+    }
+
     void saveJsonExport() {
 
         String json = readFile();
         if (json != null) {
+
             Import imp = new Gson().fromJson(json, Import.class);
 
             DataHelper.clear(Admin.class);
@@ -117,14 +143,36 @@ public class MainAdminActivity extends BaseActivity {
                 DataHelper.save(admin);
             }
 
-            DataHelper.clear(User.class);
-            for (User user: imp.getUsers()) {
-                DataHelper.save(user);
+            DataHelper.clear(Route.class);
+            for (Route route: imp.getRoutes()) {
+                DataHelper.save(route);
+            }
+
+            DataHelper.clear(Group.class);
+            for (Group group: imp.getGroups()) {
+                if (group.getRoute() != null)
+                    group.setRoute(DataHelper.findRoute(group.getRoute().getId()));
+                DataHelper.save(group);
             }
 
             DataHelper.clear(ControlPosition.class);
             for (ControlPosition control: imp.getControlPositions()) {
                 DataHelper.save(control);
+            }
+
+            DataHelper.clear(RoutePosition.class);
+            for (RoutePosition routePosition: imp.getRoutePositions()) {
+                routePosition.setRoute(DataHelper.findRoute(routePosition.getRoute().getId()));
+                routePosition.setControlPosition(DataHelper
+                        .findControlPosition(routePosition.getControlPosition().getId()));
+                DataHelper.save(routePosition);
+            }
+
+            DataHelper.clear(User.class);
+            for (User user: imp.getUsers()) {
+                if (user.getGroup() != null)
+                    user.setGroup(DataHelper.findGroup(user.getGroup().getId()));
+                DataHelper.save(user);
             }
 
             DataHelper.clear(Position.class);
@@ -168,8 +216,12 @@ public class MainAdminActivity extends BaseActivity {
 
         System.out.println("Tamano admins "+DataHelper.getAllAdmins().size());
         System.out.println("Tamano users "+DataHelper.getAllUsers().size());
+        System.out.println("Tamano groups "+DataHelper.getAllGroups().size());
+        System.out.println("Tamano routes "+DataHelper.getAllRoutes().size());
         System.out.println("Tamano watchs "+DataHelper.getAllWatches().size());
         System.out.println("Tamano positions "+DataHelper.getAllPositions().size());
+        System.out.println("Tamano route positions "+DataHelper.getAllRoutePositions().size());
+        System.out.println("Tamano route markers "+DataHelper.getAllRouteMarkers().size());
         System.out.println("Tamano Control positions "+DataHelper.getAllControlPositions().size());
         System.out.println("positions "+DataHelper.getAllPositions().toString());
     }

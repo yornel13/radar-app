@@ -1,9 +1,16 @@
 package com.guardias.yornel.gpslocation.app;
 
+import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
@@ -17,6 +24,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.guardias.yornel.gpslocation.R;
+import com.guardias.yornel.gpslocation.db.DataHelper;
 import com.guardias.yornel.gpslocation.db.LoginAdminTask;
 import com.guardias.yornel.gpslocation.db.LoginUserTask;
 import com.guardias.yornel.gpslocation.entity.Admin;
@@ -33,6 +41,7 @@ public class LoginActivity extends BaseActivity implements LoginAdminTask.AdminL
     public static final String TAG = "LoginActivity";
 
     private static final long SPLASH_SCREEN_DELAY = 1500;
+    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
 
     private ImageView background;
     private RelativeLayout container;
@@ -127,6 +136,7 @@ public class LoginActivity extends BaseActivity implements LoginAdminTask.AdminL
     }
 
     public void login(View view) {
+        checkPermission();
 
         if (userField.getText().toString().isEmpty()) {
             userField.setError(getString(R.string.introduce_user));
@@ -163,6 +173,31 @@ public class LoginActivity extends BaseActivity implements LoginAdminTask.AdminL
         loginGuard = !loginGuard;
     }
 
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
+        } else {
+            builder = new AlertDialog.Builder(this);
+        }
+        builder.setMessage(R.string.close_app)
+                .setPositiveButton(R.string.si, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        onCloseApp();
+                    }
+                })
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // nothing to do
+                    }
+                }).show();
+    }
+
+    public void onCloseApp() {
+        super.onBackPressed();
+    }
+
     public void hideKeyboard() {
 
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -185,15 +220,48 @@ public class LoginActivity extends BaseActivity implements LoginAdminTask.AdminL
 
     @Override
     public void loginUserSuccessful(User user) {
-        preferences.save(user);
-        hideProgressDialog();
-        startActivity(new Intent(this, GuardActivity.class));
-        finish();
+        checkPermission();
+
+        if (user.getGroup() == null
+                || user.getGroup().getRoute() == null) {
+            Snackbar.make(containerLogin,
+                    R.string.this_user_dont_have_route, Snackbar.LENGTH_LONG).show();
+            hideProgressDialog();
+        } else {
+            preferences.save(user);
+            hideProgressDialog();
+            startActivity(new Intent(this, GuardActivity.class));
+            finish();
+        }
     }
 
     @Override
     public void loginUserFailure(String message) {
         hideProgressDialog();
         Snackbar.make(containerLogin, message, Snackbar.LENGTH_LONG).show();
+    }
+
+
+    public void checkPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.READ_EXTERNAL_STORAGE)) {
+
+                } else {
+
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                            PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+
+                }
+            }
+
+            System.out.println(ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE));
+        }
     }
 }

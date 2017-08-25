@@ -11,13 +11,12 @@ import com.guardias.yornel.gpslocation.entity.User;
 import com.guardias.yornel.gpslocation.entity.Watch;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Yornel on 04-jul-16.
  */
 public class AppPreferences {
-
-    public static final String PREF_FILE_NAME = "app-radar14";
 
     private static final String ID = "id";
     private static final String C_POSITION = "control_position";
@@ -31,7 +30,7 @@ public class AppPreferences {
 
     public AppPreferences(Context context) {
         this.context = context;
-        preferences = context.getSharedPreferences(PREF_FILE_NAME, context.MODE_PRIVATE);
+        preferences = context.getSharedPreferences(Const.DB_NAME, context.MODE_PRIVATE);
     }
 
     public User getUser() {
@@ -67,6 +66,17 @@ public class AppPreferences {
         }
     }
 
+    public ArrayList<ControlPosition> getUserRoute() {
+        String routeUser = preferences.getString(C_POSITION, null);
+        if (routeUser == null) {
+            return null;
+        } else {
+            ArrayList<ControlPosition> positions = new Gson()
+                    .fromJson(routeUser, new TypeToken<ArrayList<ControlPosition>>() {}.getType());
+            return positions;
+        }
+    }
+
     public void save(User user) {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(USER, new Gson().toJson(user));
@@ -86,6 +96,12 @@ public class AppPreferences {
         positions.add(position);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(POSITIONS, new Gson().toJson(positions));
+        editor.commit();
+    }
+
+    public void saveUserRoute(List<ControlPosition> positions) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(C_POSITION, new Gson().toJson(positions));
         editor.commit();
     }
 

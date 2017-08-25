@@ -16,12 +16,13 @@ public class User extends RealmObject {
 	// Fields
 
 	private Long id;
+	private Group group;
 	private String dni;
 	private String name;
 	private String lastname;
 	private String password;
-	private Long create;
-	private Long update;
+	private Long createDate;
+	private Long lastUpdate;
 	private Boolean active;
 
 	@Ignore
@@ -53,6 +54,10 @@ public class User extends RealmObject {
 		return this.name;
 	}
 
+	public String getFullName() {
+		return this.lastname+" "+this.name;
+	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -81,20 +86,28 @@ public class User extends RealmObject {
 		this.password = password;
 	}
 
-	public Long getCreate() {
-		return create;
+	public Group getGroup() {
+		return group;
 	}
 
-	public void setCreate(Long create) {
-		this.create = create;
+	public void setGroup(Group group) {
+		this.group = group;
 	}
 
-	public Long getUpdate() {
-		return update;
+	public Long getCreateDate() {
+		return createDate;
 	}
 
-	public void setUpdate(Long update) {
-		this.update = update;
+	public void setCreateDate(Long createDate) {
+		this.createDate = createDate;
+	}
+
+	public Long getLastUpdate() {
+		return lastUpdate;
+	}
+
+	public void setLastUpdate(Long lastUpdate) {
+		this.lastUpdate = lastUpdate;
 	}
 
 	public Boolean getActive() {

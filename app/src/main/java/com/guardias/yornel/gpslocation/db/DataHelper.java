@@ -6,11 +6,16 @@ package com.guardias.yornel.gpslocation.db;
 
 import com.guardias.yornel.gpslocation.entity.Admin;
 import com.guardias.yornel.gpslocation.entity.ControlPosition;
+import com.guardias.yornel.gpslocation.entity.Group;
 import com.guardias.yornel.gpslocation.entity.Position;
+import com.guardias.yornel.gpslocation.entity.Route;
+import com.guardias.yornel.gpslocation.entity.RouteMarker;
+import com.guardias.yornel.gpslocation.entity.RoutePosition;
 import com.guardias.yornel.gpslocation.entity.User;
 import com.guardias.yornel.gpslocation.entity.Watch;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmModel;
@@ -85,6 +90,27 @@ public class DataHelper {
         return results;
     }
 
+    public static Route findRoute(Long id) {
+        realm = Realm.getDefaultInstance();
+        Route results = realm.where(Route.class)
+                .equalTo("id", id).findFirst();
+        return results;
+    }
+
+    public static Group findGroup(Long id) {
+        realm = Realm.getDefaultInstance();
+        Group results = realm.where(Group.class)
+                .equalTo("id", id).findFirst();
+        return results;
+    }
+
+    public static ControlPosition findControlPosition(Long id) {
+        realm = Realm.getDefaultInstance();
+        ControlPosition results = realm.where(ControlPosition.class)
+                .equalTo("id", id).findFirst();
+        return results;
+    }
+
     public static RealmResults<ControlPosition> getAllControlPositionsActive() {
         realm = Realm.getDefaultInstance();
         RealmResults<ControlPosition> results = realm
@@ -92,10 +118,28 @@ public class DataHelper {
         return results;
     }
 
+    public static RealmResults<RoutePosition> getAllRoutePositionsByRouteId(Long routeId) {
+        realm = Realm.getDefaultInstance();
+        RealmResults<RoutePosition> results = realm
+                .where(RoutePosition.class).equalTo("route.id", routeId).findAll();
+        realm.close();
+        return results;
+    }
+
+    public static ArrayList<ControlPosition> getAllControlsByUser(User user) {
+        ArrayList<ControlPosition> controlPositions = new ArrayList<>();
+        for (RoutePosition routePosition :
+                getAllRoutePositionsByRouteId(user.getGroup().getRoute().getId())) {
+            controlPositions.add(routePosition.getControlPosition());
+        }
+        return controlPositions;
+    }
+
     public static RealmResults<ControlPosition> getAllControlPositions() {
         realm = Realm.getDefaultInstance();
         RealmResults<ControlPosition> results = realm
                 .where(ControlPosition.class).findAll();
+        realm.close();
         return results;
     }
 
@@ -103,6 +147,7 @@ public class DataHelper {
         realm = Realm.getDefaultInstance();
         ControlPosition results = realm.where(ControlPosition.class).equalTo("latitude", latitude)
                 .equalTo("longitude", longitude).findFirst();
+        realm.close();
         return results;
     }
 
@@ -110,6 +155,7 @@ public class DataHelper {
         realm = Realm.getDefaultInstance();
         ArrayList<Position> results = new ArrayList(realm
                 .where(Position.class).findAll());
+        realm.close();
         return results;
     }
 
@@ -117,6 +163,7 @@ public class DataHelper {
         realm = Realm.getDefaultInstance();
         ArrayList<Position> results = new ArrayList(realm
                 .where(Position.class).equalTo("watch.startTime", startTime).findAll());
+        realm.close();
         return results;
     }
 
@@ -124,6 +171,39 @@ public class DataHelper {
         realm = Realm.getDefaultInstance();
         ArrayList<User> results = new ArrayList(realm
                 .where(User.class).findAll());
+        realm.close();
+        return results;
+    }
+
+    public static ArrayList<Group> getAllGroups() {
+        realm = Realm.getDefaultInstance();
+        ArrayList<Group> results = new ArrayList(realm
+                .where(Group.class).findAll());
+        realm.close();
+        return results;
+    }
+
+    public static ArrayList<Route> getAllRoutes() {
+        realm = Realm.getDefaultInstance();
+        ArrayList<Route> results = new ArrayList(realm
+                .where(Route.class).findAll());
+        realm.close();
+        return results;
+    }
+
+    public static ArrayList<RouteMarker> getAllRouteMarkers() {
+        realm = Realm.getDefaultInstance();
+        ArrayList<RouteMarker> results = new ArrayList(realm
+                .where(RouteMarker.class).findAll());
+        realm.close();
+        return results;
+    }
+
+    public static ArrayList<RoutePosition> getAllRoutePositions() {
+        realm = Realm.getDefaultInstance();
+        ArrayList<RoutePosition> results = new ArrayList(realm
+                .where(RoutePosition.class).findAll());
+        realm.close();
         return results;
     }
 
@@ -131,6 +211,7 @@ public class DataHelper {
         realm = Realm.getDefaultInstance();
         ArrayList<Watch> results = new ArrayList(realm
                 .where(Watch.class).findAll());
+        realm.close();
         return results;
     }
 
@@ -138,6 +219,7 @@ public class DataHelper {
         realm = Realm.getDefaultInstance();
         ArrayList<Watch> results = new ArrayList(realm
                 .where(Watch.class).equalTo("user.dni", dni).findAll());
+        realm.close();
         return results;
     }
 
@@ -145,6 +227,7 @@ public class DataHelper {
         realm = Realm.getDefaultInstance();
         ArrayList<Admin> results = new ArrayList(realm
                 .where(Admin.class).findAll());
+        realm.close();
         return results;
     }
 

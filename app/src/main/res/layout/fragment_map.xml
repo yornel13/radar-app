@@ -14,6 +14,14 @@
         android:layout_width="match_parent"
         android:layout_height="150dp">
 
+        <TextView
+            android:id="@+id/user_name"
+            android:layout_alignParentRight="true"
+            android:layout_margin="6dp"
+            android:textStyle="italic|bold"
+            android:textSize="14dp"
+            style="@style/info_label"/>
+
         <RelativeLayout
             android:id="@+id/layout_main_searching"
             android:visibility="gone"

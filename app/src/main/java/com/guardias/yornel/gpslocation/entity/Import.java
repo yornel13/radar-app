@@ -8,17 +8,13 @@ import java.util.List;
 
 public class Import {
 
-    List<ControlPosition> controlPositions;
     List<User> users;
     List<Admin> admins;
-
-    public List<ControlPosition> getControlPositions() {
-        return controlPositions;
-    }
-
-    public void setControlPositions(List<ControlPosition> controlPositions) {
-        this.controlPositions = controlPositions;
-    }
+    List<ControlPosition> controlPositions;
+    List<Group> groups;
+    List<Route> routes;
+    List<RouteMarker> routeMarkers;
+    List<RoutePosition> routePositions;
 
     public List<User> getUsers() {
         return users;
@@ -36,4 +32,43 @@ public class Import {
         this.admins = admins;
     }
 
+    public List<ControlPosition> getControlPositions() {
+        return controlPositions;
+    }
+
+    public void setControlPositions(List<ControlPosition> controlPositions) {
+        this.controlPositions = controlPositions;
+    }
+
+    public List<Group> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
+    }
+
+    public List<Route> getRoutes() {
+        return routes;
+    }
+
+    public void setRoutes(List<Route> routes) {
+        this.routes = routes;
+    }
+
+    public List<RouteMarker> getRouteMarkers() {
+        return routeMarkers;
+    }
+
+    public void setRouteMarkers(List<RouteMarker> routeMarkers) {
+        this.routeMarkers = routeMarkers;
+    }
+
+    public List<RoutePosition> getRoutePositions() {
+        return routePositions;
+    }
+
+    public void setRoutePositions(List<RoutePosition> routePositions) {
+        this.routePositions = routePositions;
+    }
 }

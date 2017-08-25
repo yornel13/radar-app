@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -130,5 +131,11 @@ public class BaseActivity extends AppCompatActivity {
     public void hideProgressDialog() {
         if (progressDialog != null)
             progressDialog.dismiss();
+    }
+
+    public void goLoginActivity() {
+        startActivity(new Intent(this, LoginActivity.class));
+        preferences.clearUser();
+        finish();
     }
 }

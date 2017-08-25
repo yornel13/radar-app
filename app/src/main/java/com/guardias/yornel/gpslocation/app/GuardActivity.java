@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -35,6 +36,7 @@ import com.guardias.yornel.gpslocation.entity.Position;
 import com.guardias.yornel.gpslocation.entity.User;
 import com.guardias.yornel.gpslocation.entity.Watch;
 import com.guardias.yornel.gpslocation.util.GpsTestListener;
+import com.guardias.yornel.gpslocation.util.NetworkUtility;
 
 import org.json.JSONArray;
 
@@ -50,7 +52,7 @@ public class GuardActivity extends BaseActivity implements LocationListener {
     private static GuardActivity sInstance;
 
     private LocationManager mLocationManager;
-    private LocationProvider mProvider;
+    private String mProvider;
 
     // Listeners for Fragments
     private ArrayList<GpsTestListener> mGpsTestListeners = new ArrayList<>();
@@ -78,16 +80,30 @@ public class GuardActivity extends BaseActivity implements LocationListener {
 
         sInstance = this;
 
-        mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        mProvider = mLocationManager.getProvider(LocationManager.GPS_PROVIDER);
+        getProvider();
         if (mProvider == null) {
             Log.e(TAG, "Unable to get GPS_PROVIDER");
             Toast.makeText(this, getString(R.string.gps_not_supported),
                     Toast.LENGTH_SHORT).show();
-            finish();
+            goLoginActivity();
             return;
+        } else {
+            Log.i(TAG, "PROVIDER: "+mProvider);
         }
         checkWatch();
+    }
+
+    private void getProvider() {
+        mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (NetworkUtility.isNetworkAvailable(this)) {
+            Log.i(TAG, "*********NETWORK SELECTED PROVIDER*********");
+            Criteria criteria = new Criteria();
+            criteria.setAccuracy(Criteria.ACCURACY_FINE);
+            mProvider = mLocationManager.getBestProvider(criteria, true);
+        } else {
+            Log.i(TAG, "*********AUTO SELECTED GPS LIKE PROVIDER*********");
+            mProvider = mLocationManager.getProvider(LocationManager.GPS_PROVIDER).getName();
+        }
     }
 
     public void checkWatch() {
@@ -97,19 +113,45 @@ public class GuardActivity extends BaseActivity implements LocationListener {
                 watch.getUser().getDni().equals(guard.getDni())) { // if is same guard
             continueCreate();
         } else if (watch == null) {                            // if guard don't has previous watch
-            watch = new Watch();
-            watch.setStartTime(System.currentTimeMillis());
-            watch.setUser(guard);
-            preferences.clearWatchs();
-            preferences.save(watch);
-            Snackbar.make(mViewPager, getString(R.string.init_new_watch), Snackbar.LENGTH_LONG).show();
-            continueCreate();
+            createNewWatch();
         } else if (watch != null &&
                 !watch.getUser().getDni().equals(guard.getDni())) {    // if is other guard
-            Toast.makeText(this, "no es el mismo guardia", Toast.LENGTH_LONG).show();
-                finish();
+            warningDialog();
         }
     }
+
+    public void warningDialog() {
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
+        } else {
+            builder = new AlertDialog.Builder(this);
+        }
+        builder.setTitle(R.string.warning)
+                .setMessage(R.string.warning_watch)
+                .setPositiveButton(R.string.si, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        createNewWatch();
+                    }
+                })
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(GuardActivity.this, "no es el mismo guardia", Toast.LENGTH_LONG).show();
+                        goLoginActivity();
+                    }
+                }).show();
+    }
+
+    private void createNewWatch() {
+        Watch watch = new Watch();
+        watch.setStartTime(System.currentTimeMillis());
+        watch.setUser(preferences.getUser());
+        preferences.clearWatchs();
+        preferences.save(watch);
+        Snackbar.make(mViewPager, getString(R.string.init_new_watch), Snackbar.LENGTH_LONG).show();
+        continueCreate();
+    }
+
 
     public void continueCreate() {
 
@@ -146,14 +188,14 @@ public class GuardActivity extends BaseActivity implements LocationListener {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.finish:
-                finishDialog();
+                finishDialog(null);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    public void finishDialog() {
+    public void finishDialog(View view) {
         AlertDialog.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
@@ -190,18 +232,47 @@ public class GuardActivity extends BaseActivity implements LocationListener {
         realm.commitTransaction();
 
         ArrayList<Position> positionsList = preferences.getPositions();
-        for (Position position: positionsList) {
-            position.setWatch(watch);
-            position.setControlPosition(DataHelper
-                    .getControlPositionByLat(position.getControlPosition().getLatitude(),
-                            position.getControlPosition().getLongitude()));
-        }
-        for (Position position: positionsList) {
-            position.save();
+
+        if (positionsList != null) {
+            for (Position position : positionsList) {
+                position.setWatch(watch);
+                position.setControlPosition(DataHelper
+                        .getControlPositionByLat(position.getControlPosition().getLatitude(),
+                                position.getControlPosition().getLongitude()));
+            }
+            for (Position position : positionsList) {
+                position.save();
+            }
         }
         preferences.clearAll();
         finish();
+        startActivity(new Intent(this, LoginActivity.class));
         Toast.makeText(this, R.string.watch_finish, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mViewPager.getCurrentItem() == 1) {
+            mViewPager.setCurrentItem(0);
+        } else {
+            AlertDialog.Builder builder;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
+            } else {
+                builder = new AlertDialog.Builder(this);
+            }
+            builder.setMessage(R.string.close_user)
+                    .setPositiveButton(R.string.si, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            goLoginActivity();
+                        }
+                    })
+                    .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // nothing to do
+                        }
+                    }).show();
+        }
     }
 
     private void checkTimeAndDistance() {
@@ -223,7 +294,7 @@ public class GuardActivity extends BaseActivity implements LocationListener {
                     return;
                 }
                 mLocationManager
-                        .requestLocationUpdates(mProvider.getName(), minTime, minDistance, this);
+                        .requestLocationUpdates(mProvider, minTime, minDistance, this);
                 Toast.makeText(this, String.format(getString(R.string.gps_set_location_listener),
                         String.valueOf(tempMinTimeDouble), String.valueOf(minDistance)),
                         Toast.LENGTH_SHORT
@@ -241,7 +312,8 @@ public class GuardActivity extends BaseActivity implements LocationListener {
                 return;
             }
             mLocationManager
-                    .requestLocationUpdates(mProvider.getName(), minTime, minDistance, this);
+                    .requestLocationUpdates(mProvider, minTime, minDistance, this);
+
             mStarted = true;
 
             // Show Toast only if the user has set minTime or minDistance to something other than default values

@@ -8,6 +8,7 @@ import android.location.GnssMeasurementsEvent;
 import android.location.GnssStatus;
 import android.location.GpsStatus;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -44,6 +45,7 @@ import com.guardias.yornel.gpslocation.entity.ControlPosition;
 import com.guardias.yornel.gpslocation.entity.Position;
 import com.guardias.yornel.gpslocation.entity.RoutePosition;
 import com.guardias.yornel.gpslocation.util.AppPreferences;
+import com.guardias.yornel.gpslocation.util.DateUtil;
 import com.guardias.yornel.gpslocation.util.GpsTestListener;
 
 import java.text.SimpleDateFormat;
@@ -147,6 +149,11 @@ public class GuardMapFragment extends Fragment implements OnMapReadyCallback, Gp
         circularButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (!guardActivity.mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    disableRegister();
+                    guardActivity.promptEnableGps();
+                    return;
+                }
                 if (circularButton.getProgress() == 0) {
                     circularButton.setProgress(50);
                     saveActualPosition();
@@ -198,7 +205,14 @@ public class GuardMapFragment extends Fragment implements OnMapReadyCallback, Gp
             position.setLatitude(mLatLng.latitude);
             position.setLongitude(mLatLng.longitude);
             position.setTime(System.currentTimeMillis());
-            position.setUpdateTime(System.currentTimeMillis());
+            ArrayList<Position> positionsSaved = preferences.getPositions();
+            if (positionsSaved == null || positionsSaved.isEmpty()) {
+                position.setUpdateTime(DateUtil.differenceBetweenSeconds(position.getTime(),
+                        preferences.getWatch().getStartTime()));
+            } else {
+                position.setUpdateTime(DateUtil.differenceBetweenSeconds(position.getTime(),
+                        positionsSaved.get(preferences.getPositions().size() - 1).getTime()));
+            }
             preferences.save(position);
             checkMarkers(false);
             Snackbar.make(layoutContent, R.string.position_saved, Snackbar.LENGTH_LONG).show();
@@ -460,12 +474,12 @@ public class GuardMapFragment extends Fragment implements OnMapReadyCallback, Gp
 
     @Override
     public void onProviderEnabled(String s) {
-        Toast.makeText(getActivity(), "provider enable", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), R.string.enabled_gps, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onProviderDisabled(String s) {
-        Toast.makeText(getActivity(), "provider disable", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), R.string.disabled_gps, Toast.LENGTH_SHORT).show();
         disableRegister();
     }
 

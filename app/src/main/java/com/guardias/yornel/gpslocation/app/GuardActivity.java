@@ -2,8 +2,6 @@ package com.guardias.yornel.gpslocation.app;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,7 +13,6 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -26,10 +23,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationAvailability;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 import com.guardias.yornel.gpslocation.R;
 import com.guardias.yornel.gpslocation.db.DataHelper;
 import com.guardias.yornel.gpslocation.entity.Position;
@@ -38,21 +39,19 @@ import com.guardias.yornel.gpslocation.entity.Watch;
 import com.guardias.yornel.gpslocation.util.GpsTestListener;
 import com.guardias.yornel.gpslocation.util.NetworkUtility;
 
-import org.json.JSONArray;
-
 import java.util.ArrayList;
-import java.util.List;
 
 import static com.guardias.yornel.gpslocation.util.Const.SECONDS_TO_MILLISECONDS;
 
 public class GuardActivity extends BaseActivity implements LocationListener {
 
     private static final String TAG = "GuardActivity";
+    private static final String REQUESTING_LOCATION_UPDATES_KEY = "REQUESTING_LOCATION_UPDATES_KEY";
 
     private static GuardActivity sInstance;
 
-    private LocationManager mLocationManager;
-    private String mProvider;
+    public LocationManager mLocationManager;
+    private LocationProvider mProvider;
 
     // Listeners for Fragments
     private ArrayList<GpsTestListener> mGpsTestListeners = new ArrayList<>();
@@ -62,6 +61,12 @@ public class GuardActivity extends BaseActivity implements LocationListener {
 
     boolean mStarted;
     boolean locating;
+    private FusedLocationProviderClient mFusedLocationClient;
+    private LocationCallback mLocationCallback;
+    private boolean mRequestingLocationUpdates;
+
+    private boolean doneFusedProvider;
+    private boolean doneGPSProvider;
 
     static GuardActivity getInstance() {
         return sInstance;
@@ -91,6 +96,9 @@ public class GuardActivity extends BaseActivity implements LocationListener {
             Log.i(TAG, "PROVIDER: "+mProvider);
         }
         checkWatch();
+
+        if (savedInstanceState != null)
+            updateValuesFromBundle(savedInstanceState);
     }
 
     private void getProvider() {
@@ -99,10 +107,14 @@ public class GuardActivity extends BaseActivity implements LocationListener {
             Log.i(TAG, "*********NETWORK SELECTED PROVIDER*********");
             Criteria criteria = new Criteria();
             criteria.setAccuracy(Criteria.ACCURACY_FINE);
-            mProvider = mLocationManager.getBestProvider(criteria, true);
+            if (mLocationManager.getBestProvider(criteria, true).equals(LocationManager.GPS_PROVIDER))
+                mProvider = mLocationManager.getProvider(LocationManager.GPS_PROVIDER);
+            else {
+                mProvider = mLocationManager.getProvider(LocationManager.GPS_PROVIDER);
+            }
         } else {
             Log.i(TAG, "*********AUTO SELECTED GPS LIKE PROVIDER*********");
-            mProvider = mLocationManager.getProvider(LocationManager.GPS_PROVIDER).getName();
+            mProvider = mLocationManager.getProvider(LocationManager.GPS_PROVIDER);
         }
     }
 
@@ -171,6 +183,10 @@ public class GuardActivity extends BaseActivity implements LocationListener {
 
         if (!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             promptEnableGps();
+        }
+
+        if (mRequestingLocationUpdates) {
+            startLocationUpdates();
         }
 
         checkTimeAndDistance();
@@ -293,8 +309,10 @@ public class GuardActivity extends BaseActivity implements LocationListener {
                     // TODO: Consider calling
                     return;
                 }
-                mLocationManager
-                        .requestLocationUpdates(mProvider, minTime, minDistance, this);
+                mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+                startLocationUpdates();
+                mLocationManager.requestLocationUpdates(mProvider.getName(), minTime, minDistance, this);
                 Toast.makeText(this, String.format(getString(R.string.gps_set_location_listener),
                         String.valueOf(tempMinTimeDouble), String.valueOf(minDistance)),
                         Toast.LENGTH_SHORT
@@ -311,8 +329,7 @@ public class GuardActivity extends BaseActivity implements LocationListener {
                 // TODO: Consider calling
                 return;
             }
-            mLocationManager
-                    .requestLocationUpdates(mProvider, minTime, minDistance, this);
+            mLocationManager.requestLocationUpdates(mProvider.getName(), minTime, minDistance, this);
 
             mStarted = true;
 
@@ -328,6 +345,9 @@ public class GuardActivity extends BaseActivity implements LocationListener {
 
             // Reset the options menu to trigger updates to action bar menu items
             invalidateOptionsMenu();
+
+            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+            startLocationUpdates();
         }
         for (GpsTestListener listener : mGpsTestListeners) {
             listener.gpsStart();
@@ -346,7 +366,7 @@ public class GuardActivity extends BaseActivity implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-
+        Log.i(TAG, location.getProvider()+" status updated");
         invalidateOptionsMenu();
 
         for (GpsTestListener listener : mGpsTestListeners) {
@@ -366,6 +386,8 @@ public class GuardActivity extends BaseActivity implements LocationListener {
         for (GpsTestListener listener : mGpsTestListeners) {
             listener.onProviderEnabled(provider);
         }
+        doneClear();
+        checkProviders();
     }
 
     @Override
@@ -388,7 +410,7 @@ public class GuardActivity extends BaseActivity implements LocationListener {
     /**
      * Ask the user if they want to enable GPS
      */
-    private void promptEnableGps() {
+    public void promptEnableGps() {
         new AlertDialog.Builder(this)
                 .setMessage(getString(R.string.enable_gps_message))
                 .setPositiveButton(getString(R.string.enable_gps_positive_button),
@@ -443,4 +465,76 @@ public class GuardActivity extends BaseActivity implements LocationListener {
         locating = !locating;
     }
 
+    private void startLocationUpdates() {
+        mRequestingLocationUpdates = true;
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                for (Location location : locationResult.getLocations()) {
+                    onLocationChanged(location);
+                }
+            }
+            @Override
+            public void onLocationAvailability(LocationAvailability locationAvailability) {
+                super.onLocationAvailability(locationAvailability);
+                doneFusedProvider = false;
+                if (!locationAvailability.isLocationAvailable()) {
+                    checkProviders();
+                }
+            }
+        };
+
+        LocationRequest mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(3000);
+        mLocationRequest.setFastestInterval(1000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
+    }
+
+    private void stopLocationUpdates() {
+        mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopLocationUpdates();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean(REQUESTING_LOCATION_UPDATES_KEY,
+                mRequestingLocationUpdates);
+        super.onSaveInstanceState(outState);
+    }
+
+    private void updateValuesFromBundle(Bundle savedInstanceState) {
+        // Update the value of mRequestingLocationUpdates from the Bundle.
+        if (savedInstanceState.keySet().contains(REQUESTING_LOCATION_UPDATES_KEY)) {
+            mRequestingLocationUpdates = savedInstanceState.getBoolean(
+                    REQUESTING_LOCATION_UPDATES_KEY);
+        }
+    }
+
+    public void checkProviders() {
+        if (!isDoneAnyProvider()) {
+            Toast.makeText(GuardActivity.this, R.string.problem_for_location, Toast.LENGTH_SHORT).show();
+            mSectionsPagerAdapter.map.disableRegister();
+        }
+    }
+
+    public Boolean isDoneAnyProvider() {
+        if (doneFusedProvider) {
+            return true;
+        }
+        if (doneGPSProvider) {
+            return true;
+        }
+        return false;
+    }
+
+    public void doneClear() {
+        doneGPSProvider = false;
+        doneFusedProvider = false;
+    }
 }

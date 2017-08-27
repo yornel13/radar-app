@@ -28,9 +28,12 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainAdminActivity extends BaseActivity {
+
+    String jsonName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +84,7 @@ public class MainAdminActivity extends BaseActivity {
         } else {
             builder = new AlertDialog.Builder(this);
         }
-        builder.setMessage("Imformacion exportada con exito a la carpeta databases como \"radar.json\".")
+        builder.setMessage("Imformacion exportada con exito a la carpeta databases como \""+jsonName+"\".")
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // nothing to do
@@ -191,14 +194,24 @@ public class MainAdminActivity extends BaseActivity {
     public void doExport(View view) {
 
         Export export = new Export();
-        export.setControlPositions(realm.copyFromRealm(DataHelper.getAllControlPositions()));
-        List<Watch> watches = realm.copyFromRealm(DataHelper.getAllWatches());
 
-        for (Watch watch: watches) {
+        List<ControlPosition> controlPositions = new ArrayList<>();
+        for (ControlPosition controlPosition:
+                realm.copyFromRealm(DataHelper.getAllControlPositions())) {
+            if (controlPosition.getId() == null) {
+                controlPositions.add(controlPosition);
+            }
+        }
+        export.setControlPositions(controlPositions);
+
+        List<Watch> watches = realm.copyFromRealm(DataHelper.getAllWatches());
+        for (Watch watch:
+                watches) {
             watch.setPositionsList(realm.copyFromRealm(DataHelper
                     .getAllPositionsByStartTime(watch.getStartTime())));
 
-            for (Position position: watch.getPositionsList()) {
+            for (Position position:
+                    watch.getPositionsList()) {
                 position.setWatch(null);
             }
         }
@@ -206,6 +219,8 @@ public class MainAdminActivity extends BaseActivity {
         export.setWatches(watches);
         String json = new Gson().toJson(export);
         writeFile(json);
+        DataHelper.clear(Position.class);
+        DataHelper.clear(Watch.class);
         dialogExportCompleted();
     }
 
@@ -228,9 +243,10 @@ public class MainAdminActivity extends BaseActivity {
 
     public void writeFile(String mJsonResponse) {
         try {
+            jsonName = "radar_"+System.currentTimeMillis()+".json";
             File folderPath = new File(Environment
                     .getExternalStorageDirectory().getPath()+"/databases");
-            File myPath = new File(folderPath, "radar.json");
+            File myPath = new File(folderPath, jsonName);
             FileWriter output = new FileWriter(myPath);
             output.write(mJsonResponse);
             output.flush();

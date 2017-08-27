@@ -78,4 +78,7 @@
     <string name="close_user">¿Seguro que desea cerrar su usuario e ir al login?</string>
     <string name="warning_watch">Hay una guardia en curso, si continua la guardia que estaba en curso se perdera, ¿desea continuar?</string>
     <string name="warning">Advertencia</string>
+    <string name="problem_for_location">Problemas para encontrar ubicacion</string>
+    <string name="enabled_gps">GPS habilitado</string>
+    <string name="disabled_gps">GPS desabilitado</string>
 </resources>

@@ -5,6 +5,8 @@ package com.guardias.yornel.gpslocation.util;/*
  */
 
 import org.joda.time.DateTime;
+import org.joda.time.Minutes;
+import org.joda.time.Seconds;
 
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -92,5 +94,19 @@ public class DateUtil {
     
     public static String getFechaCorta(DateTime dateTime) {
         return dateTime.toString("dd/MM/yyyy");
+    }
+
+    public static long differenceBetweenMinutes(Long time1, Long time2) {
+        DateTime dateTime1 = new DateTime(time1);
+        DateTime dateTime2 = new DateTime(time2);
+        Minutes minutes = Minutes.minutesBetween(dateTime2, dateTime1);
+        return Long.valueOf(minutes.getMinutes());
+    }
+
+    public static long differenceBetweenSeconds(Long time1, Long time2) {
+        DateTime dateTime1 = new DateTime(time1);
+        DateTime dateTime2 = new DateTime(time2);
+        Seconds seconds = Seconds.secondsBetween(dateTime2, dateTime1);
+        return Long.valueOf(seconds.getSeconds());
     }
 }
